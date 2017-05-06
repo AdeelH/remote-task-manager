@@ -26,7 +26,8 @@ $ list
 // List all alive or dead processes started through the Task Manager.
 $ list all
 
-// List all alive or dead processes started through the Task Manager, along with their start and end times and the elapsed time.
+// List all alive or dead processes started through the Task Manager, 
+// along with their start, end, and the elapsed times.
 $ list details
 
 // Kill process by pid or name
