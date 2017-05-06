@@ -44,20 +44,20 @@
 typedef struct
 {
 	pid_t pid;
-    int cmd_from;
-    int result_from;
-    int cmd_to;
-    int result_to;
+	int cmd_from;
+	int result_from;
+	int cmd_to;
+	int result_to;
 } task_manager;
 
 typedef struct
 {
 	task_manager* tm;
-    int msgsock;
-    // in_addr_t ip;
-    char* ip_str;
-    int port;
-    struct sockaddr_in* info;
+	int msgsock;
+	// in_addr_t ip;
+	char* ip_str;
+	int port;
+	struct sockaddr_in* info;
 } client;
 
 typedef struct clnode
@@ -143,7 +143,7 @@ int main()
 				else if ((e.data.fd == sock) && (client_count < MAX_CLIENTS))
 				{
 					add_client();
-			        // printify("Client added.\n");
+					// printify("Client added.\n");
 				}
 				else //TODO
 				{
@@ -171,27 +171,27 @@ void handle_client_input(client* cl)
 		write(STDOUT_FILENO, buff, r);
 	}
 	// printify("Reading cmd pipe\n");
-    // input length
+	// input length
 	int len = 0;
 	r = read(cl->tm->cmd_from, &len, LENGTH_BYTES);
-    if (r <= 0) // no input at the moment
-    {
-        return;
-    }
-    assert(len <= BUFF_SIZE);
-    // actual input
+	if (r <= 0) // no input at the moment
+	{
+		return;
+	}
+	assert(len <= BUFF_SIZE);
+	// actual input
 	char input[BUFF_SIZE];
 	r = read(cl->tm->cmd_from, input, len);
-    if (r == -1)
-    {
-        perror("SV read cmd");
-        return;
-    }
-    if (r < len)
-    {
-        printify("Incomplete read. len: %d, r: %d\n", len, r);
-        return;
-    }
+	if (r == -1)
+	{
+		perror("SV read cmd");
+		return;
+	}
+	if (r < len)
+	{
+		printify("Incomplete read. len: %d, r: %d\n", len, r);
+		return;
+	}
 	char* cmd = strtok(input, " ");
 	if (!strcmp(cmd, "msg"))
 	{
@@ -215,11 +215,11 @@ void handle_stdin_input()
 		return;
 	}
 	input[r-1] = '\0';
-    lower(input);
-    // keep a copy of the original input
-    int original_len = strlen(input) + 1;
-    char original[original_len];
-    memcpy(original, input, original_len);
+	lower(input);
+	// keep a copy of the original input
+	int original_len = strlen(input) + 1;
+	char original[original_len];
+	memcpy(original, input, original_len);
 
 	char* cmd = strtok(input, " ");
 	if (!strcmp(cmd, "broadcast")) // broadcast
@@ -232,9 +232,9 @@ void handle_stdin_input()
 		}
 	}
 	else if (!strcmp(cmd, "q") || !strcmp(cmd, "ex") || !strcmp(cmd, "quit") || !strcmp(cmd, "exit"))
-    {
-        exit_gracefully();
-    }
+	{
+		exit_gracefully();
+	}
 	else if (!strcmp(cmd, "list"))
 	{
 		list_clients();
@@ -307,20 +307,20 @@ void list_clients()
 void register_signal_handlers()
 {
 	if (signal(SIGCHLD, sigchld_handler) == SIG_ERR)
-    {
-        perror("signal: SIGCHLD");
+	{
+		perror("signal: SIGCHLD");
 		exit(EXIT_FAILURE);
-    }
-    if (signal(SIGINT, exit_handler) == SIG_ERR)
-    {
-        perror("signal: SIGINT");
+	}
+	if (signal(SIGINT, exit_handler) == SIG_ERR)
+	{
+		perror("signal: SIGINT");
 		exit(EXIT_FAILURE);
-    }
-    if (signal(SIGTERM, exit_handler) == SIG_ERR)
-    {
-        perror("signal: SIGTERM");
+	}
+	if (signal(SIGTERM, exit_handler) == SIG_ERR)
+	{
+		perror("signal: SIGTERM");
 		exit(EXIT_FAILURE);
-    }
+	}
 }
 
 void add_connection_listener()
@@ -363,15 +363,15 @@ void add_client()
 	}
 
 	task_manager* tm = make_TM(msgsock);
-    if (!tm)
-    {
-    	printify("Failed to start TM\n");
-    	return;
-    }
+	if (!tm)
+	{
+		printify("Failed to start TM\n");
+		return;
+	}
 	// printify("TM started.\n");
 	
 	client* cl = make_client(tm, msgsock, cl_info);
-    // printify("Client created.\n");
+	// printify("Client created.\n");
 
 	if (add_client_listeners(cl) != 0)
 	{
@@ -379,7 +379,7 @@ void add_client()
 		free_client(cl);
 		return;
 	}
-    // printify("Client-listener added.\n");
+	// printify("Client-listener added.\n");
 
 	add_to_client_list(cl);
 }
@@ -406,55 +406,55 @@ task_manager* make_TM(int msgsock)
 	int p2c_res[2];
 	int c2p_cmd[2];
 	int c2p_res[2];
-    int exec_check_pipe[2];
-    if ((pipe2(exec_check_pipe, O_CLOEXEC) == -1) || (pipe2(p2c_cmd, O_NONBLOCK) == -1) || (pipe2(p2c_res, O_NONBLOCK) == -1) ||
-    	(pipe2(c2p_cmd, O_NONBLOCK) == -1) || (pipe2(c2p_res, O_NONBLOCK) == -1))
-    {
-    	perror("pipe");
-    	return NULL;
-    }
-    pid_t pid = fork();
-    if (pid == -1)
-    {
-        perror("add_process: fork");
+	int exec_check_pipe[2];
+	if ((pipe2(exec_check_pipe, O_CLOEXEC) == -1) || (pipe2(p2c_cmd, O_NONBLOCK) == -1) || (pipe2(p2c_res, O_NONBLOCK) == -1) ||
+		(pipe2(c2p_cmd, O_NONBLOCK) == -1) || (pipe2(c2p_res, O_NONBLOCK) == -1))
+	{
+		perror("pipe");
+		return NULL;
+	}
+	pid_t pid = fork();
+	if (pid == -1)
+	{
+		perror("add_process: fork");
 		shutdown(msgsock, SHUT_RDWR);
 		close(msgsock);
-    	return NULL;
-    }
-    if (pid > 0) // parent
-    {
-    	close(exec_check_pipe[WRITE_END]);
+		return NULL;
+	}
+	if (pid > 0) // parent
+	{
+		close(exec_check_pipe[WRITE_END]);
 		close(p2c_cmd[READ_END]);
 		close(p2c_res[READ_END]);
 		close(c2p_cmd[WRITE_END]);
 		close(c2p_res[WRITE_END]);
-    	char c;
-    	if (read(exec_check_pipe[READ_END], &c, 1) == -1)
-    	{
+		char c;
+		if (read(exec_check_pipe[READ_END], &c, 1) == -1)
+		{
 			perror("pipe read");
-    		close(exec_check_pipe[READ_END]);
+			close(exec_check_pipe[READ_END]);
 			close(p2c_cmd[WRITE_END]);
 			close(p2c_res[WRITE_END]);
 			close(c2p_cmd[READ_END]);
 			close(c2p_res[READ_END]);
-            return NULL;
-    	}
-        if (c == EXEC_FAILED)
-        {
-        	printify("exec failed\n");
-            waitpid(pid, NULL, 0);
-	    	close(exec_check_pipe[READ_END]);
+			return NULL;
+		}
+		if (c == EXEC_FAILED)
+		{
+			printify("exec failed\n");
+			waitpid(pid, NULL, 0);
+			close(exec_check_pipe[READ_END]);
 			close(p2c_cmd[WRITE_END]);
 			close(p2c_res[WRITE_END]);
 			close(c2p_cmd[READ_END]);
 			close(c2p_res[READ_END]);
-            return NULL;
-        }
-    	close(exec_check_pipe[READ_END]);
-    }
+			return NULL;
+		}
+		close(exec_check_pipe[READ_END]);
+	}
 	else // child
 	{
-    	close(exec_check_pipe[READ_END]);
+		close(exec_check_pipe[READ_END]);
 		close(p2c_cmd[WRITE_END]);
 		close(p2c_res[WRITE_END]);
 		close(c2p_cmd[READ_END]);
@@ -500,7 +500,7 @@ void rm_client_listeners(client* cl)
 {
 	epoll_ctl(epfd, EPOLL_CTL_DEL, cl->tm->cmd_from, NULL);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, cl->tm->result_from, NULL);
-    // printify("listener removed\n");
+	// printify("listener removed\n");
 }
 
 void add_to_client_list(client* cl)
@@ -580,33 +580,33 @@ void disconnect_client(client* cl)
 void search_and_disconnect(char* ip_str, int port)
 {	
 	clnode* clptr1;
-    clnode* clptr2;
-    clptr1 = clptr2 = clist_head;
+	clnode* clptr2;
+	clptr1 = clptr2 = clist_head;
 	for (; clptr2; clptr2 = clptr2->next, clptr1 = clptr2)
-    {
-    	client* cl = clptr2->cl;
-    	assert(cl != NULL);
-    	if (!strcmp(cl->ip_str, ip_str) && (cl->port == port))
-    	{
-		    // printify("found child\n");
-    		if ((clptr1 == clptr2) && (clptr1 == clist_head))
-    		{
-    			if (client_count == 1)
-	    			clist_head = NULL;
-	    		else
-		    		clist_head = clptr2->next;
-    		}
-	    	rm_client(clptr2);
+	{
+		client* cl = clptr2->cl;
+		assert(cl != NULL);
+		if (!strcmp(cl->ip_str, ip_str) && (cl->port == port))
+		{
+			// printify("found child\n");
+			if ((clptr1 == clptr2) && (clptr1 == clist_head))
+			{
+				if (client_count == 1)
+					clist_head = NULL;
+				else
+					clist_head = clptr2->next;
+			}
+			rm_client(clptr2);
 			printf("%s:%d disconnected.\n", cl->ip_str, cl->port);
-    		return;
-    	}
-    }
-    printify("Couldn't find client %s:%d\n", ip_str, port);
+			return;
+		}
+	}
+	printify("Couldn't find client %s:%d\n", ip_str, port);
 }
 
 void disconnect_all()
 {
-    rm_all_clients();
+	rm_all_clients();
 }
 
 void rm_client(clnode* node)
@@ -623,19 +623,19 @@ void rm_client(clnode* node)
 void rm_all_clients()
 {
 	if (signal(SIGCHLD, SIG_IGN) == SIG_ERR)
-    {
-        perror("rm_all_clients: signal: SIGCHLD(SIG_IGN)");
+	{
+		perror("rm_all_clients: signal: SIGCHLD(SIG_IGN)");
 		exit(EXIT_FAILURE);
-    }
-    // assert(signal(SIGCHLD, SIG_IGN) == SIG_IGN);
+	}
+	// assert(signal(SIGCHLD, SIG_IGN) == SIG_IGN);
 	rm_recurse(clist_head);
 
 	if (signal(SIGCHLD, sigchld_handler) == SIG_ERR)
-    {
-        perror("rm_all_clients: signal: SIGCHLD");
+	{
+		perror("rm_all_clients: signal: SIGCHLD");
 		exit(EXIT_FAILURE);
-    }
-    clist_head = NULL;
+	}
+	clist_head = NULL;
 }
 
 void rm_recurse(clnode* node)
@@ -650,53 +650,53 @@ void rm_recurse(clnode* node)
 
 void sigchld_handler(int signo)
 {
-    pid_t pid;
-    pid = waitpid(-1, NULL, 0);
-    if (pid < 0)
-        return;
-    // printify("killing child %d\n", pid);
-    clnode* clptr1;
-    clnode* clptr2;
-    clptr1 = clptr2 = clist_head;
-    for (; clptr2; clptr2 = clptr2->next, clptr1 = clptr2)
-    {
-    	assert(clptr2->cl != NULL);
-    	assert(clptr2->cl->tm != NULL);
-    	if (clptr2->cl->tm->pid == pid)
-    	{
-		    // printify("found child\n");
-    		if ((clptr1 == clptr2) && (clptr1 == clist_head))
-    		{
-    			if (client_count == 1)
-	    			clist_head = NULL;
-	    		else
-		    		clist_head = clptr2->next;
-    		}
-	    	rm_client(clptr2);
-    		printify("%d removed.\n", pid);
-    		return;
-    	}
-    }
+	pid_t pid;
+	pid = waitpid(-1, NULL, 0);
+	if (pid < 0)
+		return;
+	// printify("killing child %d\n", pid);
+	clnode* clptr1;
+	clnode* clptr2;
+	clptr1 = clptr2 = clist_head;
+	for (; clptr2; clptr2 = clptr2->next, clptr1 = clptr2)
+	{
+		assert(clptr2->cl != NULL);
+		assert(clptr2->cl->tm != NULL);
+		if (clptr2->cl->tm->pid == pid)
+		{
+			// printify("found child\n");
+			if ((clptr1 == clptr2) && (clptr1 == clist_head))
+			{
+				if (client_count == 1)
+					clist_head = NULL;
+				else
+					clist_head = clptr2->next;
+			}
+			rm_client(clptr2);
+			printify("%d removed.\n", pid);
+			return;
+		}
+	}
 }
 
 void printify(const char* str, ...)
 {
-    char buff[BUFF_SIZE];
+	char buff[BUFF_SIZE];
 
-    va_list args;
-    va_start(args, str);
+	va_list args;
+	va_start(args, str);
 
-    if (write(STDOUT_FILENO, buff, vsprintf(buff, str, args)) == -1)
-    {
-        perror("Server: printify: write");
-        if (errno == EBADF)
-        {
-        	exit(EXIT_FAILURE);
-        }
-    }
+	if (write(STDOUT_FILENO, buff, vsprintf(buff, str, args)) == -1)
+	{
+		perror("Server: printify: write");
+		if (errno == EBADF)
+		{
+			exit(EXIT_FAILURE);
+		}
+	}
 
-    va_end(args);
-    fsync(STDOUT_FILENO);
+	va_end(args);
+	fsync(STDOUT_FILENO);
 }
 
 void exit_gracefully()
@@ -706,22 +706,22 @@ void exit_gracefully()
 
 void exit_handler(int signo)
 {
-    rm_all_clients();
-    close(sock);
-    exit(signo);
+	rm_all_clients();
+	close(sock);
+	exit(signo);
 }
 
 void lower(char* str)
 {
-    char* c;
-    for(c = str; *c; c++)
-        *c = tolower(*c);
+	char* c;
+	for(c = str; *c; c++)
+		*c = tolower(*c);
 }
 
 void hr()
 {
-    int i;
-    for(i = 0; i < 76; ++i)
-        printify("%s", HORIZONTAL_LINE);
-    printify("\n");
+	int i;
+	for(i = 0; i < 76; ++i)
+		printify("%s", HORIZONTAL_LINE);
+	printify("\n");
 }

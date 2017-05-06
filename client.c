@@ -38,22 +38,22 @@ int connection_open = FALSE;
 
 int main(int argc, char *argv[])
 {
-    if (signal(SIGINT, exit_handler) == SIG_ERR)
-    {
-        perror("signal: SIGINT");
-        return -1;
-    }
-    if (signal(SIGTERM, exit_handler) == SIG_ERR)
-    {
-        perror("signal: SIGTERM");
-        return -1;
-    }
+	if (signal(SIGINT, exit_handler) == SIG_ERR)
+	{
+		perror("signal: SIGINT");
+		return -1;
+	}
+	if (signal(SIGTERM, exit_handler) == SIG_ERR)
+	{
+		perror("signal: SIGTERM");
+		return -1;
+	}
 	struct sockaddr_in server;
 	struct hostent *hp;
 	server.sin_family = AF_INET;
 
 	while(TRUE)
-    {
+	{
 		printify("");
 		char input[BUFF_SIZE];
 		int c;
@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
 			while(connection_open)
 			{
 				// printify("client waiting for input\n");
-	        	int r, w;    
-		        if ((r = poll(rfds, 2, -1)) < 0)
-		        {
+				int r, w;    
+				if ((r = poll(rfds, 2, -1)) < 0)
+				{
 					if (errno == EINTR)
 						continue;
 					else
@@ -115,47 +115,47 @@ int main(int argc, char *argv[])
 						perror("poll");
 						exit_gracefully();
 					}
-		        }
-		        if (rfds[1].revents & POLLIN)
-		        {
+				}
+				if (rfds[1].revents & POLLIN)
+				{
 					// printify("sock input detected\n");
-		        	char buff[BUFF_SIZE];
-		        	if ((r = read(sock, buff, BUFF_SIZE)) < 0)
-		        	{
-		        		perror("sock read");
-		        		continue;
-		        	}
-		        	if (r == 0)
-		        	{
+					char buff[BUFF_SIZE];
+					if ((r = read(sock, buff, BUFF_SIZE)) < 0)
+					{
+						perror("sock read");
+						continue;
+					}
+					if (r == 0)
+					{
 						// printify("Socket closed.\n");
 						connection_open = FALSE;
 						// raise(SIG_CONN_CLOSED);
 						break;
-		        	}
-		        	if (write(STDOUT_FILENO, buff, r) < 0)
-		        	{
-		        		perror("stdout write");
-		        		continue;
-		        	}
-		        }
-		        else if (rfds[0].revents & POLLIN)
-		        {
+					}
+					if (write(STDOUT_FILENO, buff, r) < 0)
+					{
+						perror("stdout write");
+						continue;
+					}
+				}
+				else if (rfds[0].revents & POLLIN)
+				{
 					// printify("stdin input detected\n");
-		        	char buff[BUFF_SIZE];
-		        	if ((r = read(STDIN_FILENO, buff, BUFF_SIZE)) < 0)
-		        	{
-		        		perror("stdin read");
-		        		continue;
-		        	}
-		        	buff[r-1] = '\0';
-		        	char tmp[BUFF_SIZE];
-		        	sscanf(buff, "%s", tmp);
-		        	lower(tmp);
-		        	if (!strcmp(tmp, "q") || !strcmp(tmp, "ex") || !strcmp(tmp, "quit") || !strcmp(tmp, "exit"))
-    				{
-		        		printify("exit cmd detected\n");
-		        		exit_gracefully();
-		        	}
+					char buff[BUFF_SIZE];
+					if ((r = read(STDIN_FILENO, buff, BUFF_SIZE)) < 0)
+					{
+						perror("stdin read");
+						continue;
+					}
+					buff[r-1] = '\0';
+					char tmp[BUFF_SIZE];
+					sscanf(buff, "%s", tmp);
+					lower(tmp);
+					if (!strcmp(tmp, "q") || !strcmp(tmp, "ex") || !strcmp(tmp, "quit") || !strcmp(tmp, "exit"))
+					{
+						printify("exit cmd detected\n");
+						exit_gracefully();
+					}
 					if ((w = write(sock, &r, LENGTH_BYTES)) < 0)
 					{
 						perror("Writing to socket");
@@ -174,9 +174,9 @@ int main(int argc, char *argv[])
 						break;
 					}
 					// printify("sent cmd %s\n", buff);
-		        }
-		    }
-		    disconnect();
+				}
+			}
+			disconnect();
 		}
 		else
 		{
@@ -194,18 +194,18 @@ void disconnect()
 
 void printify(const char* str, ...)
 {
-    char buff[BUFF_SIZE];
+	char buff[BUFF_SIZE];
 
-    va_list args;
-    va_start(args, str);
+	va_list args;
+	va_start(args, str);
 
-    write(STDOUT_FILENO, PROMPT, sizeof(PROMPT));
-    if (write(STDOUT_FILENO, buff, vsprintf(buff, str, args)) == -1)
-    {
-        perror("printify: write");
-    }
-    fsync(STDOUT_FILENO);
-    va_end(args);
+	write(STDOUT_FILENO, PROMPT, sizeof(PROMPT));
+	if (write(STDOUT_FILENO, buff, vsprintf(buff, str, args)) == -1)
+	{
+		perror("printify: write");
+	}
+	fsync(STDOUT_FILENO);
+	va_end(args);
 }
 
 void exit_gracefully()
@@ -226,9 +226,9 @@ void exit_handler(int signo)
 
 void lower(char* str)
 {
-    char* c;
-    for(c = str; *c; c++)
-        *c = tolower(*c);
+	char* c;
+	for(c = str; *c; c++)
+		*c = tolower(*c);
 }
 
 void sig_conn_closed_handler()
