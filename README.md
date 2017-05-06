@@ -1,5 +1,5 @@
 # Description
-// A commandline app that allows clients to execute programs on a remote computer. Supports multiple concurrent clients.
+A commandline app that allows clients to execute programs on a remote computer. Supports multiple concurrent clients.
 
 # Commands
 
