@@ -35,11 +35,11 @@ A commandline app that allows clients to execute programs on a remote computer. 
 
 # Kill all processes
 > kill [all | *]
+
+# Add, subtract, multiply or divide.
 > add [<num1> [<num2> …]]
 > sub [<num1> [<num2> …]]
 > mul [<num1> [<num2> …]]
-
-# Add, subtract, multiply or divide.
 > div [<num1> [<num2> …]]
 
 # Exit the Task Manager.
